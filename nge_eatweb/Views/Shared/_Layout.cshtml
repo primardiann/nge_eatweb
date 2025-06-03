@@ -2,45 +2,168 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - nge_eatweb</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/nge_eatweb.styles.css" asp-append-version="true" />
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .navbar-ngeeat {
+            background-color: #3A1F1F;
+        }
+
+        /* Navbar content centered */
+        .navbar-collapse-centered {
+            display: flex;
+            justify-content: center; /* center horizontally */
+            align-items: center;
+            gap: 3rem; /* space between left nav, logo, right nav */
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .navbar-nav-left,
+        .navbar-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; /* space between nav items */
+        }
+
+            .navbar-nav-left .nav-link,
+            .navbar-nav-right .nav-link {
+                color: white;
+                font-weight: 500;
+            }
+
+        .logo-center {
+            max-height: 50px;
+        }
+
+        .icon-bar {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background-color: white;
+            margin: 4px 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #3A1F1F;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-left,
+        .footer-right {
+            margin: 0 auto 1rem auto;
+            max-width: 300px;
+        }
+
+            .footer-left img,
+            .footer-right img {
+                max-height: 40px;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .footer-left p,
+            .footer-right a {
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .footer-right a {
+                color: white;
+                text-decoration: none;
+            }
+
+                .footer-right a i {
+                    margin-right: 5px;
+                }
+    </style>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- HEADER -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-ngeeat navbar-expand-md sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">nge_eatweb</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <a class="navbar-brand d-inline-block d-md-none" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" class="img-fluid" alt="Logo" />
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered" aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse navbar-collapse-centered" id="navbarCentered">
+                    <ul class="navbar-nav navbar-nav-left">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" href="#menu">Menu</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" href="#location">Location</a>
+                        </li>
+                    </ul>
+
+                    <a class="navbar-brand d-none d-md-inline-block" asp-area="" asp-controller="Home" asp-action="Index">
+                        <img src="~/images/logo.png" class="logo-center" alt="Logo" />
+                    </a>
+
+                    <ul class="navbar-nav navbar-nav-right">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#instagram">Instagram</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contact">Contact</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- KONTEN -->
+    <main role="main" class="container my-4">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
         <div class="container">
-            &copy; 2025 - nge_eatweb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="footer-left mb-4">
+                <img src="~/images/logo.png" class="img-fluid" alt="Logo" />
+                <p>&copy; 2025 - Ngeeat. Site by Kelompok 4</p>
+            </div>
+            <div class="footer-right">
+                <a href="https://www.instagram.com/nge_eat_/" target="_blank"><i class="fab fa-instagram"></i> NGEEAT</a>
+            </div>
         </div>
     </footer>
+
+    <!-- SCRIPT -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
