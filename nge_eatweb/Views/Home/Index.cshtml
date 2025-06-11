@@ -2,110 +2,148 @@
     ViewData["Title"] = "Landing Page";
 }
 
-<style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #fff;
-        color: #BE1E2D;
-    }
-
-    .landing-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
-
-    h1.main-title {
-        font-size: 3.5rem;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 2rem;
-        text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-    }
-
-    .bg-section {
-        position: relative;
-        width: 100%;
-        height: 320px;
-        margin-bottom: 2rem;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .bg-section:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-        }
-
-    .bg-image {
-        position: absolute;
-        inset: 0;
-        background-size: cover;
-        background-position: center;
-        filter: brightness(0.6);
-        transition: filter 0.3s ease;
-    }
-
-    .bg-section:hover .bg-image {
-        filter: brightness(0.85);
-    }
-
-    .overlay-text {
-        position: absolute;
-        bottom: 25px;
-        left: 25px;
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 700;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-        user-select: none;
-    }
-
-    @@media (max-width: 600px) {
-        h1 .main-title
-
-    {
-        font-size: 2.2rem;
-    }
-
-    .bg-section {
-        height: 200px;
-        border-radius: 15px;
-    }
-
-    .overlay-text {
-        font-size: 1.3rem;
-        bottom: 15px;
-        left: 15px;
-    }
-
-    }
-</style>
-
-<div class="landing-wrapper">
-    <h1 class="main-title">Nge Eat By<br />Nada</h1>
-
-    <div class="bg-section">
-        <div class="bg-image" style="background-image: url('/images/cabe_ijo.png');"></div>
-        <div class="overlay-text">Cabe Ijo</div>
-    </div>
-
-    <div class="bg-section">
-        <div class="bg-image" style="background-image: url('/images/chicken_mentai.png');"></div>
-        <div class="overlay-text">Chicken Mentai</div>
-    </div>
-
-    <div class="bg-section">
-        <div class="bg-image" style="background-image: url('/images/sambal_geprek.png');"></div>
-        <div class="overlay-text">Sambal Geprek</div>
+<!-- HERO SECTION -->
+<div class="hero-content">
+    <div class="hero-inner container-fluid px-0 text-white text-start">
+        <div class="row m-0">
+            <div class="col-lg-6 col-md-8 p-5">
+                <h1 class="fw-bold mb-3">Kelola Keuangan Usaha Kuliner Lebih Mudah</h1>
+                <p class="mb-4">
+                    NgeEat bantu kamu mencatat, memantau, dan menganalisis laporan keuangan harian usaha kuliner kamu secara otomatis, cepat, dan rapi.
+                </p>
+                <a href="/Dashboard" class="btn-dashboard">Masuk ke Dashboard</a>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- FITUR SECTION -->
+<section id="fitur" class="fitur-section py-5 text-start text-dark">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Fitur Unggulan</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded shadow-sm fitur-card h-100">
+                    <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
+                    <h5 class="fw-semibold text-brown">Pencatatan Transaksi</h5>
+                    <p>Mencatat pemasukan dan pengeluaran harian dari berbagai platform seperti GoFood, GrabFood, dan ShopeeFood.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded shadow-sm fitur-card h-100">
+                    <i class="fas fa-chart-line fa-2x mb-3 text-success"></i>
+                    <h5 class="fw-semibold text-brown">Analisis Keuangan</h5>
+                    <p>Menampilkan grafik pendapatan, pengeluaran, dan laba bersih agar kamu bisa ambil keputusan dengan lebih cepat dan tepat.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded shadow-sm fitur-card h-100">
+                    <i class="fas fa-file-invoice-dollar fa-2x mb-3 text-info"></i>
+                    <h5 class="fw-semibold text-brown">Laporan Otomatis</h5>
+                    <p>Unduh laporan keuangan mingguan dan bulanan dalam format PDF atau Excel secara otomatis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TENTANG SECTION -->
+<section id="tentang" class="tentang-section py-5 text-dark text-start">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Tentang NgeEat</h2>
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <p style="font-size: 1.05rem;">
+                    <strong>NgeEat</strong> adalah aplikasi berbasis web yang dibuat untuk membantu pelaku usaha kuliner dalam mengelola keuangan harian mereka secara lebih praktis dan efisien. Kami tahu betapa repotnya mencatat transaksi secara manual, apalagi kalau usahamu punya banyak channel seperti GoFood, GrabFood, atau ShopeeFood.
+                </p>
+                <p style="font-size: 1.05rem;">
+                    Dengan NgeEat, kamu bisa mencatat pemasukan dan pengeluaran dengan cepat, menganalisis laporan keuangan lewat grafik yang jelas, dan mengunduh laporan otomatis tanpa ribet.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <div class="p-4 bg-white bg-opacity-75 rounded shadow-sm">
+                    <h5 class="fw-semibold mb-3 text-orange"><i class="fas fa-bullseye me-2"></i> Misi Kami</h5>
+                    <p class="mb-3 text-dark">
+                        Menjadi partner keuangan digital terpercaya bagi UMKM kuliner di Indonesia.
+                    </p>
+                    <h5 class="fw-semibold mb-3 text-orange"><i class="fas fa-seedling me-2"></i> Visi Kami</h5>
+                    <p class="text-dark">
+                        Membantu pelaku usaha kuliner bertumbuh melalui pencatatan keuangan yang cerdas dan mudah digunakan.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STYLES -->
+<style>
+    /* HERO */
+    .hero-content {
+        width: 100vw;
+        min-height: 100vh;
+        background-image: linear-gradient(to bottom right, rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/bg.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .hero-inner {
+        width: 100%;
+    }
+
+    .btn-dashboard {
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        background-color: #BE1E2D;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-dashboard:hover {
+            background-color: #a31824;
+        }
+
+    /* FITUR */
+    .fitur-section {
+        background-color: #FFF4E7;
+    }
+
+    .fitur-card {
+        background-color: #FFE0C4;
+    }
+
+    .text-brown {
+        color: #5A3A1C;
+    }
+
+    /* TENTANG */
+    .tentang-section {
+        background-color: #FFD5AB;
+    }
+
+    .text-orange {
+        color: #E06B10;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .hero-content {
+            min-height: auto;
+        }
+
+        .col-lg-6 {
+            padding: 2rem 1rem !important;
+        }
+    }
+</style>

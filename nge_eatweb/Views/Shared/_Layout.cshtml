@@ -5,11 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - nge_eatweb</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/nge_eatweb.styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
     <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
         html, body {
             height: 100%;
             margin: 0;
@@ -18,147 +27,111 @@
         body {
             display: flex;
             flex-direction: column;
+            background-color: white;
+        }
+
+        header,
+        footer {
+            background: linear-gradient(to bottom, #FFD5AB, #F58220);
         }
 
         main {
             flex: 1;
-        }
-
-        .navbar-ngeeat {
-            background-color: #3A1F1F;
-        }
-
-        /* Navbar content centered */
-        .navbar-collapse-centered {
+            background-color: white;
             display: flex;
-            justify-content: center; 
-            align-items: center;
-            gap: 3rem; 
-            flex-wrap: nowrap;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: start;
             width: 100%;
         }
 
-        .navbar-nav-left,
-        .navbar-nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem; 
+
+        .navbar-ngeeat {
+            background: transparent !important;
         }
 
-            .navbar-nav-left .nav-link,
-            .navbar-nav-right .nav-link {
-                color: white;
-                font-weight: 500;
-            }
-
-        .logo-center {
+        .navbar-brand img {
             max-height: 50px;
         }
 
-        .icon-bar {
-            display: block;
-            width: 22px;
-            height: 2px;
-            background-color: white;
-            margin: 4px 0;
+        .hero-section h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #BE1E2D;
+            margin-bottom: 1rem;
         }
 
-        /* Footer */
+        .hero-section p {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .btn-dashboard {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #BE1E2D;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-dashboard:hover {
+                background-color: #a31824;
+            }
+
         footer {
-            background-color: #3A1F1F;
             color: white;
             padding: 2rem 0;
             text-align: center;
         }
 
-        .footer-left,
-        .footer-right {
-            margin: 0 auto 1rem auto;
-            max-width: 300px;
+        .footer-left img {
+            max-height: 40px;
+            margin-bottom: 0.5rem;
         }
 
-            .footer-left img,
-            .footer-right img {
-                max-height: 40px;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .footer-left p,
-            .footer-right a {
-                margin-top: 0.5rem;
-                font-size: 0.9rem;
-            }
-
-            .footer-right a {
-                color: white;
-                text-decoration: none;
-            }
-
-                .footer-right a i {
-                    margin-right: 5px;
-                }
+        .footer-left p {
+            font-size: 0.9rem;
+        }
     </style>
-
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- HEADER -->
     <header>
         <nav class="navbar navbar-ngeeat navbar-expand-md sticky-top">
-            <div class="container-fluid">
-                <a class="navbar-brand d-inline-block d-md-none" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo.png" class="img-fluid" alt="Logo" />
+            <div class="container-fluid d-flex align-items-center justify-content-between px-3">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index" style="gap: 8px;">
+                    <img src="~/images/logo.png" alt="Logo Ngeeat Admin" style="max-height: 45px;" />
+                    <span style="color: white; font-weight: 600; font-size: 1.1rem;">Nge Eat By Nada</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCentered" aria-controls="navbarCentered" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-
-                <div class="collapse navbar-collapse navbar-collapse-centered" id="navbarCentered">
-                    <ul class="navbar-nav navbar-nav-left">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#menu">Menu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#location">Location</a>
-                        </li>
-                    </ul>
-
-                    <a class="navbar-brand d-none d-md-inline-block" asp-area="" asp-controller="Home" asp-action="Index">
-                        <img src="~/images/logo.png" class="logo-center" alt="Logo" />
-                    </a>
-
-                    <ul class="navbar-nav navbar-nav-right">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#instagram">Instagram</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#contact">Contact</a>
-                        </li>
-                    </ul>
+                <!-- Optional Nav Items -->
+                <div class="d-none d-md-flex gap-4">
+                    <a href="#fitur" class="text-white text-decoration-none fw-semibold">Fitur</a>
+                    <a href="#tentang" class="text-white text-decoration-none fw-semibold">Tentang</a>
+                    <a href="/Dashboard" class="btn btn-sm btn-light fw-semibold px-3 rounded-pill">Dashboard</a>
                 </div>
             </div>
         </nav>
     </header>
 
+
     <!-- KONTEN -->
-    <main role="main" class="container my-4">
+    <main role="main">
         @RenderBody()
     </main>
 
     <!-- FOOTER -->
     <footer>
         <div class="container">
-            <div class="footer-left mb-4">
+            <div class="footer-left">
                 <img src="~/images/logo.png" class="img-fluid" alt="Logo" />
-                <p>&copy; 2025 - Ngeeat. Site by Kelompok 4</p>
-            </div>
-            <div class="footer-right">
-                <a href="https://www.instagram.com/nge_eat_/" target="_blank"><i class="fab fa-instagram"></i> NGEEAT</a>
+                <p>&copy; 2025 - Ngeeat <br /> Kelompok 4</p>
             </div>
         </div>
     </footer>
