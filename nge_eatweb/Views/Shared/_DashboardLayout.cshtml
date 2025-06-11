@@ -1,0 +1,96 @@
+﻿@using System.Security.Claims
+@{
+    var user = User;
+    var userName = user.Identity?.IsAuthenticated == true ? user.Identity.Name : "Guest";
+    var userEmail = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "email@example.com";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>NgeEat Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #1f2937;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            transition: transform 0.3s ease;
+        }
+
+            .sidebar.closed {
+                transform: translateX(-100%);
+            }
+
+            .sidebar ul {
+                list-style: none;
+                padding: 1rem;
+            }
+
+                .sidebar ul li {
+                    margin: 1rem 0;
+                }
+
+                    .sidebar ul li a {
+                        color: white;
+                        text-decoration: none;
+                    }
+
+        .main-content {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+            padding: 1rem;
+        }
+
+            .main-content.full {
+                margin-left: 0;
+            }
+
+        .header {
+            background-color: #1f2937;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body x-data="{ sidebarOpen: true }">
+    <div class="sidebar" x-bind:class="{ 'closed': !sidebarOpen }">
+        <div style="padding: 1rem; font-size: 1.5rem; font-weight: bold;">🍽️ NgeEat</div>
+        <ul>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/gofood">Transaksi GoFood</a></li>
+            <li><a href="/grabfood">Transaksi GrabFood</a></li>
+            <li><a href="/shopeefood">Transaksi ShopeeFood</a></li>
+        </ul>
+    </div>
+
+    <div x-bind:class="{ 'full': !sidebarOpen }" class="main-content">
+        <div class="header">
+            <div class="toggle-btn" x-on:click="sidebarOpen = !sidebarOpen">☰</div>
+            <div>
+                <strong>@userName</strong><br />
+                <small>@userEmail</small>
+            </div>
+        </div>
+        <main>
+            @RenderBody()
+        </main>
+    </div>
+</body>
+</html>
