@@ -1,11 +1,11 @@
 ﻿@using System.Security.Claims
 @{
-    var user = User;
-    var userName = user.Identity?.IsAuthenticated == true ? user.Identity.Name : "Guest";
-    var userEmail = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "email@example.com";
+    Layout = null;
+    var user = User;    
 }
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ sidebarOpen: true, transaksiOpen: false }">
 <head>
     <meta charset="utf-8" />
     <title>NgeEat Dashboard</title>
@@ -15,14 +15,21 @@
         body {
             margin: 0;
             font-family: sans-serif;
+            background-color: #f3f4f6;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #1f2937;
-            color: #fff;
             position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 45;
             height: 100vh;
+            background: linear-gradient(to bottom, #FFD5AB, #F58220);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 10px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease;
         }
 
@@ -30,19 +37,73 @@
                 transform: translateX(-100%);
             }
 
-            .sidebar ul {
-                list-style: none;
-                padding: 1rem;
+        .sidebar-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+            .sidebar-logo img {
+                height: 90px;
+                width: auto;
+                padding: 5px;
+                object-fit: contain;
             }
 
-                .sidebar ul li {
-                    margin: 1rem 0;
+        .sidebar-separator {
+            height: 2px;
+            background-color: #ffffff;
+            margin: 20px 0;
+        }
+
+        nav.sidebar-nav {
+            display: flex;
+            flex-direction: column;
+        }
+
+            nav.sidebar-nav > a,
+            nav.sidebar-nav .submenu > a.menu-item {
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                color: #ffffff;
+                transition: background-color 0.2s ease, color 0.2s ease;
+                border: 2px solid transparent;
+                user-select: none;
+                cursor: pointer;
+                margin-bottom: 6px;
+            }
+
+                nav.sidebar-nav > a:hover,
+                nav.sidebar-nav .submenu > a.menu-item:hover,
+                nav.sidebar-nav > a.active,
+                nav.sidebar-nav .submenu > a.menu-item.active {
+                    background-color: #ffffff;
+                    color: #FF6B00;
+                    border: 2px solid #ffffff;
                 }
 
-                    .sidebar ul li a {
-                        color: white;
-                        text-decoration: none;
-                    }
+            nav.sidebar-nav .submenu {
+                display: none;
+                flex-direction: column;
+                margin-left: 20px;
+            }
+
+                nav.sidebar-nav .submenu.open {
+                    display: flex;
+                }
+
+                nav.sidebar-nav .submenu > a {
+                    padding: 10px 20px;
+                    font-weight: 500;
+                    border-radius: 6px;
+                    margin-bottom: 4px;
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
 
         .main-content {
             margin-left: 250px;
@@ -54,40 +115,66 @@
                 margin-left: 0;
             }
 
-        .header {
-            background-color: #1f2937;
-            color: white;
-            padding: 1rem;
+        .topbar {
+            height: 64px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        .toggle-btn {
-            cursor: pointer;
-            font-size: 1.2rem;
+            padding: 0 20px;
         }
     </style>
 </head>
-<body x-data="{ sidebarOpen: true }">
+<body>
     <div class="sidebar" x-bind:class="{ 'closed': !sidebarOpen }">
-        <div style="padding: 1rem; font-size: 1.5rem; font-weight: bold;">🍽️ NgeEat</div>
-        <ul>
-            <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/gofood">Transaksi GoFood</a></li>
-            <li><a href="/grabfood">Transaksi GrabFood</a></li>
-            <li><a href="/shopeefood">Transaksi ShopeeFood</a></li>
-        </ul>
+        <div class="sidebar-logo">
+            <a href="/dashboard">
+                <img src="/images/logo.png" alt="Logo" />
+            </a>
+        </div>
+
+        <div class="sidebar-separator"></div>
+
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                🏠 Dashboard
+            </a>
+            <a href="/menus" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Menus" ? "active" : "")">
+                📋 Menu
+            </a>
+
+            <a href="/gofood" class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "GoFood" ? "active" : "")">
+                💰 Transaksi Gofood
+            </a>
+
+            <a href="/items-terjual" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ItemsTerjual" ? "active" : "")">
+                📦 Item Terjual
+            </a>
+
+            <a href="/laporan" class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Laporan" ? "active" : "")">
+                📊 Laporan
+            </a>
+
+        </nav>
     </div>
 
-    <div x-bind:class="{ 'full': !sidebarOpen }" class="main-content">
-        <div class="header">
-            <div class="toggle-btn" x-on:click="sidebarOpen = !sidebarOpen">☰</div>
-            <div>
-                <strong>@userName</strong><br />
-                <small>@userEmail</small>
+    <div class="main-content" x-bind:class="{ 'full': !sidebarOpen }">
+        <header class="topbar">
+            <button x-on:click="sidebarOpen = !sidebarOpen"
+                    style="font-size: 24px; cursor: pointer; background: none; border: none; color: #F58220;">
+                ☰
+            </button>
+
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <form method="post" asp-controller="Login" asp-action="Logout">
+                    <button type="submit" style="background: none; border: none; cursor: pointer; color: #BE1E2D;">
+                        Logout
+                    </button>
+                </form>
             </div>
-        </div>
+        </header>
+
         <main>
             @RenderBody()
         </main>

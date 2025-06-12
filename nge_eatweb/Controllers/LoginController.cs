@@ -83,10 +83,14 @@ namespace nge_eatweb.Controllers
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            // Proses logout dengan menghapus cookie
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Login");
+
+            // Redirect ke halaman Home/Index
+            return RedirectToAction("Index", "Home");
         }
 
         // Fungsi hashing SHA-256
@@ -101,5 +105,7 @@ namespace nge_eatweb.Controllers
                 return builder.ToString();
             }
         }
+
+
     }
 }

@@ -7,7 +7,7 @@
 <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: transparent; width: 100%; margin: 0; padding: 0; position: absolute; top: 0; left: 0;">
 
     <!-- Kotak login -->
-    <div style="width: 100%; max-width: 450px; padding: 20px; border: 1px solid #F58220; background-color: #FFF7F0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="width: 100%; max-width: 400px; padding: 30px 25px; border: 1px solid #F58220; background-color: #FFF7F0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px;">
 
         <!-- Logo -->
         <div style="display: flex; justify-content: center; margin-bottom: 24px;">
@@ -15,7 +15,7 @@
         </div>
 
         <!-- Judul -->
-        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 23px;">
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
             <span style="font-size: 18px; font-weight: 550; text-align: center;">Masuk Akun Anda</span>
         </div>
 
@@ -27,20 +27,14 @@
 
         <!-- Form Login -->
         <form asp-action="Login" asp-controller="Login" method="post">
-            <div style="margin-bottom: 23px;">
+            <div style="margin-bottom: 25px;">
                 <input type="email" name="Email" placeholder="Email" required class="form-control" style="width: 100%; border: 1px solid #F58220; padding: 10px; border-radius: 4px;" />
             </div>
-            <div style="margin-bottom: 23px;">
+            <div style="margin-bottom: 25px;">
                 <input type="password" name="Password" placeholder="Kata Sandi" required class="form-control" style="width: 100%; border: 1px solid #F58220; padding: 10px; border-radius: 4px;" />
             </div>
-            <div style="margin-bottom: 23px;">
-                <label><input type="checkbox" name="RememberMe" /> Ingat saya selama 30 hari</label>
-            </div>
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                <a href="#" style="font-size: 14px;">Lupa Kata Sandi?</a>
-            </div>
             <div style="display: flex; justify-content: center; margin-top: 30px;">
-                <button type="submit" style="width: 350px; height: 50px; background-color: #BE1E2D; color: white; font-weight: 600; font-size: 16px; border-radius: 8px;">
+                <button type="submit" style="width: 100%; max-width: 350px; height: 48px; background-color: #BE1E2D; color: white; font-weight: 600; font-size: 16px; border-radius: 8px;">
                     Masuk
                 </button>
             </div>
