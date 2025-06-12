@@ -1,6 +1,14 @@
 ﻿@model nge_eatweb.ViewModels.MenuFormViewModel
 
-<form asp-action="Create" method="post" id="formTambahMenu" class="w-full max-w-xl text-sm text-gray-700">
+@{
+    var actionUrl = Model.Id != 0
+        ? Url.Action("Edit", "Menus")
+        : Url.Action("Create", "Menus");
+}
+
+<form method="post" action="@actionUrl" id="formTambahMenu" class="w-full max-w-xl text-sm text-gray-700">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
     <div class="grid grid-cols-2 gap-x-6 gap-y-4">
         <!-- Nama Menu -->
         <div class="col-span-2">
@@ -13,7 +21,7 @@
                    required />
         </div>
 
-        <!-- Kategori (input manual) -->
+        <!-- Kategori -->
         <div class="col-span-2">
             <label for="Kategori" class="mb-1 block">Kategori</label>
             <input type="text" name="Kategori" id="Kategori"
@@ -38,24 +46,13 @@
 
     <!-- Tombol -->
     <div class="mt-6 flex justify-end space-x-2">
-        @if (Model.Id != 0)
-        {
-            <!-- Form edit -->
-            <button type="button" onclick="closeEditModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
-                Batal
-            </button>
-        }
-        else
-        {
-            <!-- Form tambah -->
-            <button type="button" onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
-                Batal
-            </button>
-        }
+        <button type="button" onclick="@(Model.Id != 0 ? "closeEditModal()" : "closeModal()")"
+                class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
+            Batal
+        </button>
 
         <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white px-4 py-1.5 rounded">
             Simpan
         </button>
     </div>
-
 </form>
