@@ -1,0 +1,142 @@
+﻿@model nge_eatweb.ViewModels.MenuIndexViewModel
+
+@{
+    ViewData["Title"] = "Daftar Menu GoFood";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="flex min-h-screen bg-[#FAFAFA] text-sm">
+    <main class="flex-1 px-8 py-6">
+        <!-- Breadcrumb -->
+        <div class="text-gray-500 mb-4 flex items-center space-x-1">
+            <a href="/dashboard" class="text-black font-semibold hover:underline">Dashboard</a>
+            <span class="text-[#888]">></span>
+            <span class="text-[#888]">Daftar Menu</span>
+        </div>
+
+        <!-- Judul dan Tombol Tambah -->
+        <div class="mb-6">
+            <button type="button" class="flex items-center gap-2 px-3 py-1 text-white font-medium rounded-lg"
+                    style="background-color: #F58220;" onclick="openModal()">
+                <span class="text-lg">+</span>
+                <span>Tambah Menu</span>
+            </button>
+        </div>
+
+        <!-- Tabel Daftar Menu -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <table class="min-w-full table-auto">
+                <thead class="bg-[#ffd5ab] text-gray-700 text-center text-sm font-semibold select-none">
+                    <tr>
+                        <th class="px-6 py-3">Nama Menu</th>
+                        <th class="px-6 py-3">Kategori</th>
+                        <th class="px-6 py-3">Harga</th>
+                        <th class="px-6 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white text-gray-700 text-sm text-center">
+                    @if (Model.Menus != null && Model.Menus.Any())
+                    {
+                        foreach (var menu in Model.Menus)
+                        {
+                            <tr class="border-t hover:bg-gray-50">
+                                <td class="px-6 py-3">@menu.NamaItem</td>
+                                <td class="px-6 py-3">@menu.Kategori</td>
+                                <td class="px-6 py-3">@($"Rp{menu.Harga:N0}")</td>
+                                <td class="px-6 py-3">
+                                    <div class="flex justify-center space-x-4">
+                                        <a href="javascript:void(0)" onclick="openEditModal(@menu.Id)"
+                                           class="text-blue-600 hover:text-blue-800" title="Edit">
+                                            <i class="fas fa-pen-to-square text-lg"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@menu.Id" method="post"
+                                              onsubmit="return confirm('Yakin ingin menghapus menu ini?');">
+                                            <button type="submit" class="text-red-600 hover:text-red-800" title="Hapus">
+                                                <i class="fas fa-trash-alt text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="py-6 text-center text-gray-500">Belum ada data menu.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="mt-6 flex justify-center space-x-2">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a asp-action="Index" asp-route-page="@i"
+                       class="px-3 py-1 rounded-md border text-sm @((i == Model.CurrentPage) ? "bg-[#F58220] text-white" : "bg-white text-gray-700 hover:bg-gray-100")">
+                        @i
+                    </a>
+                }
+            </div>
+        }
+    </main>
+</div>
+
+<!-- Modal Tambah Menu -->
+<div id="modalTambahMenu" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        <h2 class="text-xl font-semibold mb-4">Tambah Menu Baru</h2>
+        @await Html.PartialAsync("_MenuFormPartial", Model.FormModel)
+        <button onclick="closeModal()"
+                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+            &times;
+        </button>
+    </div>
+</div>
+
+<!-- Modal Edit Menu -->
+<div id="modalEditMenu" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center z-50">
+    <div id="modalEditMenuContent" class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        <button onclick="closeEditModal()"
+                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+            &times;
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openModal() {
+            document.getElementById('modalTambahMenu').classList.remove('hidden');
+            document.getElementById('modalTambahMenu').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modalTambahMenu').classList.remove('flex');
+            document.getElementById('modalTambahMenu').classList.add('hidden');
+        }
+
+        function openEditModal(menuId) {
+            fetch(`/Menus/EditModal/${menuId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('modalEditMenuContent').innerHTML = html;
+                    document.getElementById('modalEditMenu').classList.remove('hidden');
+                    document.getElementById('modalEditMenu').classList.add('flex');
+                })
+                .catch(err => {
+                    alert('Gagal memuat form edit.');
+                    console.error(err);
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('modalEditMenu').classList.remove('flex');
+            document.getElementById('modalEditMenu').classList.add('hidden');
+        }
+    </script>
+}

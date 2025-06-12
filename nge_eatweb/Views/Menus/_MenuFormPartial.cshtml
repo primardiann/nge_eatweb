@@ -1,0 +1,61 @@
+﻿@model nge_eatweb.ViewModels.MenuFormViewModel
+
+<form asp-action="Create" method="post" id="formTambahMenu" class="w-full max-w-xl text-sm text-gray-700">
+    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+        <!-- Nama Menu -->
+        <div class="col-span-2">
+            <label for="NamaItem" class="mb-1 block">Nama Menu</label>
+            <input type="text" name="NamaItem" id="NamaItem"
+                   class="border rounded-sm px-2 py-1 w-full"
+                   style="border-color: #F58220;"
+                   placeholder="Contoh: Nasi Ayam Geprek"
+                   value="@Model.NamaItem"
+                   required />
+        </div>
+
+        <!-- Kategori (input manual) -->
+        <div class="col-span-2">
+            <label for="Kategori" class="mb-1 block">Kategori</label>
+            <input type="text" name="Kategori" id="Kategori"
+                   class="border rounded-sm px-2 py-1 w-full"
+                   style="border-color: #F58220;"
+                   placeholder="Contoh: Minuman / Makanan"
+                   value="@Model.Kategori"
+                   required />
+        </div>
+
+        <!-- Harga -->
+        <div class="col-span-2">
+            <label for="Harga" class="mb-1 block">Harga</label>
+            <input type="number" name="Harga" id="Harga"
+                   class="border rounded-sm px-2 py-1 w-full"
+                   style="border-color: #F58220;"
+                   placeholder="Contoh: 25000"
+                   value="@Model.Harga"
+                   required />
+        </div>
+    </div>
+
+    <!-- Tombol -->
+    <div class="mt-6 flex justify-end space-x-2">
+        @if (Model.Id != 0)
+        {
+            <!-- Form edit -->
+            <button type="button" onclick="closeEditModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
+                Batal
+            </button>
+        }
+        else
+        {
+            <!-- Form tambah -->
+            <button type="button" onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
+                Batal
+            </button>
+        }
+
+        <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white px-4 py-1.5 rounded">
+            Simpan
+        </button>
+    </div>
+
+</form>
