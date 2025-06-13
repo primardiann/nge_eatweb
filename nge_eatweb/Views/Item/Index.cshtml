@@ -1,5 +1,50 @@
 ﻿@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    ViewData["Title"] = "Item Terjual";
 }
 
-<p>Ini konten utama Item Terjual🎉</p>
+<div class="flex min-h-screen bg-[#FAFAFA] text-sm">
+    <main class="flex-1 px-8 py-6">
+
+        <!-- Breadcrumb -->
+        <div class="text-gray-500 mb-4 flex items-center space-x-1">
+            <a asp-controller="Dashboard" asp-action="Index" class="text-black font-semibold hover:underline">
+                Dashboard
+            </a>
+            <span class="text-[#888]">&gt;</span>
+            <span class="text-[#888]">Item Terjual</span>
+        </div>
+
+        <!-- Filter Tanggal -->
+        <div class="flex justify-end items-center mb-6 relative">
+            <input type="date" id="tanggalFilter" name="tanggalFilter" class="px-3 py-1 border rounded" />
+        </div>
+
+        <!-- Tabel Item Terjual -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <table class="min-w-full table-auto">
+                <thead class="bg-[#ffd5ab] text-gray-700 text-center text-sm font-semibold select-none">
+                    <tr>
+                        <th class="px-6 py-3">Kategori</th>
+                        <th class="px-6 py-3">Nama Menu</th>
+                        <th class="px-6 py-3">Harga</th>
+                        <th class="px-6 py-3">Item Terjual</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 text-center text-sm">
+                    @* Placeholder untuk data kosong *@
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-500 py-4">Data belum tersedia.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Dummy Pagination -->
+<div class="mt-6 mb-10 flex justify-center space-x-2">
+    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-[#F58220] text-white">1</a>
+    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">2</a>
+    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">3</a>
+</div>

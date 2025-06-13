@@ -2,7 +2,7 @@
 
 namespace nge_eatweb.Controllers
 {
-    public class GoFoodController : Controller
+    public class GofoodController : Controller
     {
         public IActionResult Index()
         {
