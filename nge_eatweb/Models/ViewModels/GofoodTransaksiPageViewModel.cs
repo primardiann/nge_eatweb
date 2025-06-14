@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace nge_eatweb.Models.ViewModels
+﻿namespace nge_eatweb.Models.ViewModels
 {
     public class GofoodTransaksiPageViewModel
     {

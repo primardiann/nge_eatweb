@@ -31,9 +31,8 @@
                     <tr>
                         <th class="px-6 py-3">ID Pesanan</th>
                         <th class="px-6 py-3">Tanggal</th>
-                        <th class="px-6 py-3">Waktu</th>
+                        <th class="px-6 py-3">Kategori</th>
                         <th class="px-6 py-3">Nama Pelanggan</th>
-                        <th class="px-6 py-3">Metode</th>
                         <th class="px-6 py-3 max-w-[150px]">Item</th>
                         <th class="px-6 py-3">Aksi</th>
                     </tr>
@@ -48,27 +47,51 @@
                             <tr class="border-t hover:bg-gray-50">
                                 <td class="px-6 py-3">@t.IdPesanan</td>
                                 <td class="px-6 py-3">@t.TanggalTransaksi.ToString("yyyy-MM-dd")</td>
-                                <td class="px-6 py-3">@t.Waktu</td>
+                                <td class="px-6 py-3">
+                                    <ul>
+                                        @foreach (var item in t.Items)
+                                        {
+                                            <li>@item.Kategori</li>
+                                        }
+                                    </ul>
+                                </td>
                                 <td class="px-6 py-3">@t.NamaPelanggan</td>
-                                <td class="px-6 py-3">@t.Metode</td>
-                                <td class="px-6 py-3">@t.NamaItem</td>
+                                <td class="px-6 py-3">
+                                    <ul>
+                                        @foreach (var item in t.Items)
+                                        {
+                                            <li>@item.NamaItem</li>
+                                        }
+                                    </ul>
+                                </td>
                                 <td class="px-6 py-3">
                                     <div class="flex justify-center space-x-4">
-                                        <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                        <!-- Tombol Detail dengan ikon mata -->
+                                        <button class="text-green-600 hover:text-green-800" title="Detail"
+                                                onclick='openTransactionDetailModal(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(t)))'>
+                                            <i class="fas fa-eye text-lg"></i>
+                                        </button>
+
+                                        @* <!-- Tombol Edit -->
+                                        <a asp-action="Edit" asp-route-id="@t.IdTransaksi" class="text-blue-600 hover:text-blue-800" title="Edit">
                                             <i class="fas fa-pen-to-square text-lg"></i>
-                                        </a>
+                                        </a> *@
+
+
+                                        <!-- Tombol Hapus -->
                                         <button class="text-red-600 hover:text-red-800" title="Hapus">
                                             <i class="fas fa-trash-alt text-lg"></i>
                                         </button>
                                     </div>
                                 </td>
+
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7" class="py-6 text-center text-gray-500">Belum ada transaksi.</td>
+                            <td colspan="5" class="py-6 text-center text-gray-500">Belum ada transaksi.</td>
                         </tr>
                     }
                 </tbody>
@@ -77,17 +100,15 @@
     </main>
 </div>
 
-<!-- Modal Tambah Transaksi -->
-<div id="transactionTambahModal" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-        @await Html.PartialAsync("_GofoodTransaksiFormPartial", Model.FormModel)
+<div id="transactionTambahModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-md shadow-md p-6 w-full max-w-3xl max-h-[90vh] overflow-auto">
+        <h2 class="text-xl font-semibold mb-4 border-b pb-2" style="border-color: #F58220;">Tambah Transaksi</h2>
 
-        <button onclick="closeTambahModal()"
-                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
-            &times;
-        </button>
+        @await Html.PartialAsync("_GofoodTransaksiFormPartial", Model.FormModel)
     </div>
 </div>
+
+
 
 @section Scripts {
     <script>

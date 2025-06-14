@@ -1,33 +1,175 @@
 ﻿@model nge_eatweb.Models.ViewModels.GofoodTransaksiFormViewModel
 
-<h2 class="text-xl font-semibold mb-4">Tambah Transaksi GoFood</h2>
+<form id="formTambahTransaksi" asp-action="Create" method="post">
+    <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700">
+        <div>
+            <label asp-for="TanggalTransaksi" class="mb-1 block">Tanggal</label>
+            <input asp-for="TanggalTransaksi" type="date" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+        </div>
+        <div>
+            <label asp-for="Waktu" class="mb-1 block">Waktu</label>
+            <input asp-for="Waktu" type="time" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+        </div>
+        <div>
+            <label asp-for="IdPesanan" class="mb-1 block">ID Pesanan</label>
+            <input asp-for="IdPesanan" placeholder="Contoh: GF-1234567" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+        </div>
+        <div>
+            <label asp-for="NamaPelanggan" class="mb-1 block">Nama Pelanggan</label>
+            <input asp-for="NamaPelanggan" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+        </div>
+    </div>
 
-<form asp-action="Create" method="post">
-    <div class="mb-4">
-        <label class="block font-medium mb-1">Tanggal Transaksi</label>
-        <input type="date" asp-for="TanggalTransaksi" class="w-full border rounded px-3 py-2" />
-    </div>
-    <div class="mb-4">
-        <label class="block font-medium mb-1">Waktu</label>
-        <input type="time" asp-for="Waktu" class="w-full border rounded px-3 py-2" />
-    </div>
-    <div class="mb-4">
-        <label class="block font-medium mb-1">Pelanggan</label>
-        <input type="text" asp-for="NamaPelanggan" class="w-full border rounded px-3 py-2" />
-    </div>
-    <div class="mb-4">
-        <label class="block font-medium mb-1">Metode</label>
-        <input type="text" asp-for="Metode" class="w-full border rounded px-3 py-2" />
-    </div>
-    <div class="mb-4">
-        <label asp-for="IdItems" class="block mb-1 font-medium text-gray-700">Pilih Menu</label>
-        <select asp-for="IdItems" asp-items="Model.ItemOptions" class="w-full border rounded p-2">
-            <option value="">-- Pilih Menu --</option>
+    <!-- Dropdown Kategori -->
+    <div class="mt-4">
+        <label class="mb-1 block">Kategori</label>
+        <select id="kategoriSelect" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm">
+            <option value="">-- Pilih Kategori --</option>
+            @foreach (var kategori in Model.KategoriList.Distinct())
+            {
+                <option value="@kategori">@kategori</option>
+            }
         </select>
-        <span asp-validation-for="IdItems" class="text-red-500 text-sm"></span>
     </div>
 
-    <div class="text-right">
-        <button type="submit" class="bg-[#F58220] text-white px-4 py-2 rounded">Simpan</button>
+    <!-- Dropdown Menu & Jumlah -->
+    <div id="itemContainer" class="space-y-4 mt-4">
+        <div class="item-group grid grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block">Nama Menu</label>
+                <select name="ItemList[0].IdItem" class="item-select border rounded-sm px-2 py-1 w-full bg-white shadow-sm" required>
+                    <option value="">-- Pilih Menu --</option>
+                    @foreach (var item in Model.ItemOptions)
+                    {
+                        var parts = item.Text.Split('|');
+                        var nama = parts[0];
+                        var harga = parts.Length > 1 ? parts[1] : "0";
+                        var kategori = parts.Length > 2 ? parts[2] : "";
+                        <option value="@item.Value" data-harga="@harga" data-kategori="@kategori">@nama</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="mb-1 block">Jumlah</label>
+                <input name="ItemList[0].Jumlah" type="number" class="item-qty border rounded-sm px-2 py-1 w-full bg-white shadow-sm" value="1" min="1" required />
+            </div>
+        </div>
+    </div>
+
+    <button type="button" onclick="tambahItem()" class="mt-2 text-sm text-blue-600 underline">+ Tambah Item</button>
+
+    <div class="grid grid-cols-2 gap-4 mt-4">
+        <div>
+            <label asp-for="Metode" class="mb-1 block">Metode Pembayaran</label>
+            <input asp-for="Metode" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+        </div>
+        <div>
+            <label asp-for="Total" class="mb-1 block">Total Semua</label>
+            <input asp-for="Total" name="Total" type="number" value="0" class="border rounded-sm px-2 py-1 w-full bg-gray-100" style="border-color: #F58220;" readonly />
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-between items-center">
+        <div>
+            <button type="button" onclick="closeTambahModal()" class="bg-red-700 hover:bg-red-800 text-white px-4 py-1.5 rounded shadow mr-2">Batal</button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded shadow">Tambah</button>
+        </div>
     </div>
 </form>
+
+<script>
+    let itemIndex = 1;
+
+    function tambahItem() {
+        const container = document.getElementById("itemContainer");
+        const optionHTML = document.querySelector(".item-select").innerHTML;
+
+        const html = `
+        <div class="item-group grid grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block">Nama Menu</label>
+                <select name="ItemList[${itemIndex}].IdItem" class="item-select border rounded-sm px-2 py-1 w-full bg-white shadow-sm" required>
+                    ${optionHTML}
+                </select>
+            </div>
+            <div>
+                <label class="mb-1 block">Jumlah</label>
+                <input name="ItemList[${itemIndex}].Jumlah" type="number" class="item-qty border rounded-sm px-2 py-1 w-full bg-white shadow-sm" value="1" min="1" required />
+            </div>
+        </div>`;
+
+        container.insertAdjacentHTML("beforeend", html);
+
+        const newGroup = container.lastElementChild;
+        const newSelect = newGroup.querySelector(".item-select");
+        const newQty = newGroup.querySelector(".item-qty");
+
+        // Filter berdasarkan kategori yang dipilih
+        const selectedKategori = document.getElementById("kategoriSelect").value;
+        Array.from(newSelect.options).forEach(option => {
+            const kategori = option.getAttribute("data-kategori");
+            if (option.value !== "" && selectedKategori && kategori !== selectedKategori) {
+                option.hidden = true;
+            } else {
+                option.hidden = false;
+            }
+        });
+
+        newSelect.addEventListener("change", hitungTotal);
+        newQty.addEventListener("input", hitungTotal);
+
+        itemIndex++;
+        hitungTotal();
+    }
+
+    function hitungTotal() {
+        let total = 0;
+        const groups = document.querySelectorAll(".item-group");
+        groups.forEach(group => {
+            const select = group.querySelector(".item-select");
+            const qty = group.querySelector(".item-qty");
+
+            const harga = parseInt(select.selectedOptions[0]?.getAttribute("data-harga") || "0");
+            const jumlah = parseInt(qty.value || "0");
+
+            total += harga * jumlah;
+        });
+
+        const totalInput = document.querySelector("input[name='Total']");
+        if (totalInput) {
+            totalInput.value = total;
+        }
+    }
+
+    function inisialisasiFormTransaksi() {
+        const firstSelect = document.querySelector(".item-select");
+        const firstQty = document.querySelector(".item-qty");
+
+        if (firstSelect) firstSelect.addEventListener("change", hitungTotal);
+        if (firstQty) firstQty.addEventListener("input", hitungTotal);
+
+        hitungTotal();
+    }
+
+    // Filter menu saat kategori berubah
+    document.getElementById("kategoriSelect").addEventListener("change", function () {
+        const selectedKategori = this.value;
+        const selects = document.querySelectorAll(".item-select");
+
+        selects.forEach(select => {
+            Array.from(select.options).forEach(option => {
+                const optionKategori = option.getAttribute("data-kategori");
+                const shouldShow = !selectedKategori || optionKategori === selectedKategori || option.value === "";
+                option.hidden = !shouldShow;
+            });
+
+            if (select.selectedOptions[0]?.hidden) {
+                select.value = "";
+            }
+        });
+
+        hitungTotal();
+    });
+
+    document.addEventListener("DOMContentLoaded", inisialisasiFormTransaksi);
+</script>

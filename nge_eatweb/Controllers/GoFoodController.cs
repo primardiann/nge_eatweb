@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using nge_eatweb.Models.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace nge_eatweb.Controllers
 {
@@ -16,64 +19,200 @@ namespace nge_eatweb.Controllers
 
         public IActionResult Index()
         {
-            var transaksiList = new List<GofoodTransaksiIndexViewModel>();
-            var itemOptions = new List<SelectListItem>();
-
-            using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                conn.Open();
-
-                // Ambil daftar transaksi
-                var queryTransaksi = @"
-            SELECT t.id_transaksi, t.id_item, i.nama_item, 
-                   t.tanggal_transaksi, t.waktu, t.metode, t.nama_pelanggan
-            FROM transaksi t
-            JOIN items i ON i.id_item = t.id_item";
-                using (var cmd = new SqlCommand(queryTransaksi, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        transaksiList.Add(new GofoodTransaksiIndexViewModel
-                        {
-                            IdTransaksi = reader.GetInt32(0),
-                            IdItem = reader.GetInt32(1),
-                            NamaItem = reader.GetString(2),
-                            TanggalTransaksi = reader.GetDateTime(3),
-                            Waktu = reader.GetTimeSpan(4), 
-                            Metode = reader.GetString(5),
-                            NamaPelanggan = reader.GetString(6)
-                        });
-                    }
-                }
-
-                // Ambil daftar item untuk dropdown
-                var queryItems = "SELECT id_item, nama_item FROM items";
-                using (var cmd = new SqlCommand(queryItems, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        itemOptions.Add(new SelectListItem
-                        {
-                            Value = reader.GetInt32(0).ToString(),
-                            Text = reader.GetString(1)
-                        });
-                    }
-                }
-            }
+            var transaksiList = LoadTransaksiList();
+            var (itemOptions, kategoriList) = LoadItemOptionsWithKategori();
 
             var viewModel = new GofoodTransaksiPageViewModel
             {
                 TransaksiList = transaksiList,
                 FormModel = new GofoodTransaksiFormViewModel
                 {
-                    ItemOptions = itemOptions
+                    ItemOptions = itemOptions,
+                    KategoriList = kategoriList,
+                    TanggalTransaksi = DateTime.Now,
+                    Waktu = DateTime.Now.TimeOfDay,
+                    IdPesanan = $"GFOOD{DateTime.Now:yyyyMMddHHmmss}",
+                    ItemList = new List<ItemOrder> { new ItemOrder() }
                 }
             };
 
             return View(viewModel);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(GofoodTransaksiFormViewModel model)
+        {
+            if (!ModelState.IsValid || model.ItemList == null || !model.ItemList.Any())
+            {
+                TempData["Error"] = "Data tidak valid. Mohon cek kembali inputan Anda.";
+
+                var (itemOptions, kategoriList) = LoadItemOptionsWithKategori();
+                model.ItemOptions = itemOptions;
+                model.KategoriList = kategoriList;
+
+                var vm = new GofoodTransaksiPageViewModel
+                {
+                    TransaksiList = LoadTransaksiList(),
+                    FormModel = model
+                };
+
+                return View("Index", vm);
+            }
+
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            var itemIds = model.ItemList.Select(i => i.IdItem).Distinct().ToList();
+            if (!itemIds.Any())
+            {
+                TempData["Error"] = "Item harus diisi.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var hargaPerItem = new Dictionary<int, decimal>();
+            string queryHarga = $"SELECT id_item, harga FROM items WHERE id_item IN ({string.Join(",", itemIds)})";
+
+            using (var cmd = new SqlCommand(queryHarga, conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    hargaPerItem[reader.GetInt32(0)] = reader.GetDecimal(1);
+                }
+            }
+
+            foreach (var item in model.ItemList)
+            {
+                if (!hargaPerItem.TryGetValue(item.IdItem, out var harga))
+                {
+                    TempData["Error"] = $"Item dengan ID {item.IdItem} tidak ditemukan.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                decimal totalItem = item.Jumlah * harga;
+
+                string queryInsert = @"
+                    INSERT INTO transaksi 
+                    (id_pesanan, id_item, tanggal_transaksi, waktu, metode, nama_pelanggan, total)
+                    VALUES (@IdPesanan, @IdItem, @Tanggal, @Waktu, @Metode, @NamaPelanggan, @Total)";
+
+                using var cmdInsert = new SqlCommand(queryInsert, conn);
+                cmdInsert.Parameters.AddWithValue("@IdPesanan", model.IdPesanan);
+                cmdInsert.Parameters.AddWithValue("@IdItem", item.IdItem);
+                cmdInsert.Parameters.AddWithValue("@Tanggal", model.TanggalTransaksi);
+                cmdInsert.Parameters.AddWithValue("@Waktu", model.Waktu);
+                cmdInsert.Parameters.AddWithValue("@Metode", model.Metode);
+                cmdInsert.Parameters.AddWithValue("@NamaPelanggan", model.NamaPelanggan);
+                cmdInsert.Parameters.AddWithValue("@Total", totalItem);
+
+                cmdInsert.ExecuteNonQuery();
+            }
+
+            TempData["Success"] = "Transaksi berhasil ditambahkan.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            string query = "DELETE FROM transaksi WHERE id_transaksi = @IdTransaksi";
+
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@IdTransaksi", id);
+            cmd.ExecuteNonQuery();
+
+            TempData["Success"] = "Transaksi berhasil dihapus.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // 🔁 Helper: Load dropdown item dan kategori
+        private (List<SelectListItem>, List<string>) LoadItemOptionsWithKategori()
+        {
+            var itemOptions = new List<SelectListItem>();
+            var kategoriSet = new HashSet<string>();
+
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            string queryItems = "SELECT id_item, nama_item, harga, kategori FROM items";
+
+            using var cmd = new SqlCommand(queryItems, conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var id = reader.GetInt32(0).ToString();
+                var nama = reader.GetString(1);
+                var harga = reader.GetDecimal(2);
+                var kategori = reader.GetString(3);
+
+                itemOptions.Add(new SelectListItem
+                {
+                    Value = id,
+                    Text = $"{nama}|{harga}|{kategori}"
+                });
+
+                kategoriSet.Add(kategori);
+            }
+
+            return (itemOptions, kategoriSet.ToList());
+        }
+
+        private List<GofoodTransaksiIndexViewModel> LoadTransaksiList()
+        {
+            var transaksiDict = new Dictionary<string, GofoodTransaksiIndexViewModel>();
+
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            string query = @"
+        SELECT 
+            t.id_pesanan,
+            t.nama_pelanggan,
+            t.tanggal_transaksi,
+            t.waktu,
+            t.metode,
+            i.nama_item,
+            i.kategori
+        FROM transaksi t
+        INNER JOIN items i ON t.id_item = i.id_item
+        ORDER BY t.id_pesanan, t.id_transaksi";
+
+            using var cmd = new SqlCommand(query, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var idPesanan = reader.GetString(0); // id_pesanan
+
+                if (!transaksiDict.ContainsKey(idPesanan))
+                {
+                    transaksiDict[idPesanan] = new GofoodTransaksiIndexViewModel
+                    {
+                        IdPesanan = idPesanan,
+                        NamaPelanggan = reader.GetString(1),
+                        TanggalTransaksi = reader.GetDateTime(2),
+                        Waktu = reader.GetTimeSpan(3),
+                        Metode = reader.GetString(4),
+                        Items = new List<ItemDetail>()
+                    };
+                }
+
+                transaksiDict[idPesanan].Items.Add(new ItemDetail
+                {
+                    NamaItem = reader.GetString(5),
+                    Kategori = reader.GetString(6)
+                });
+            }
+
+
+            return transaksiDict.Values.ToList();
+        }
+
 
     }
 }

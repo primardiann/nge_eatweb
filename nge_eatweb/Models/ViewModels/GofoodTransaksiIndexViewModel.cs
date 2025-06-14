@@ -1,16 +1,21 @@
-﻿namespace nge_eatweb.Models.ViewModels
+﻿using System;
+using System.Collections.Generic;
+
+namespace nge_eatweb.Models.ViewModels
 {
     public class GofoodTransaksiIndexViewModel
     {
-        public int IdTransaksi { get; set; }
-        public int IdItem { get; set; }
-        public string NamaItem { get; set; } = "";
+        public string IdPesanan { get; set; } = string.Empty;
+        public string NamaPelanggan { get; set; } = string.Empty;
         public DateTime TanggalTransaksi { get; set; }
         public TimeSpan Waktu { get; set; }
-        public string Metode { get; set; } = "";
-        public string NamaPelanggan { get; set; } = "";
+        public string Metode { get; set; } = string.Empty;
+        public List<ItemDetail> Items { get; set; } = new();
+    }
 
-        // Properti tambahan untuk ID Pesanan custom
-        public string IdPesanan => $"GFOOD{IdTransaksi.ToString().PadLeft(5, '0')}";
+    public class ItemDetail
+    {
+        public string NamaItem { get; set; } = string.Empty;
+        public string Kategori { get; set; } = string.Empty;
     }
 }
