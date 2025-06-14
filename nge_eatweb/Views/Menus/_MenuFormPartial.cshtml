@@ -5,6 +5,10 @@
         ? Url.Action("Edit", "Menus")
         : Url.Action("Create", "Menus");
 }
+<h2 class="text-xl font-semibold mb-4">
+    @(Model.Id == 0 ? "Tambah Menu Baru" : "Edit Menu")
+</h2>
+
 
 <form method="post" action="@actionUrl" id="formTambahMenu" class="w-full max-w-xl text-sm text-gray-700">
     <input type="hidden" name="Id" value="@Model.Id" />
@@ -44,15 +48,24 @@
         </div>
     </div>
 
+
     <!-- Tombol -->
-    <div class="mt-6 flex justify-end space-x-2">
-        <button type="button" onclick="@(Model.Id != 0 ? "closeEditModal()" : "closeModal()")"
-                class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-1.5 rounded">
+    <div class="flex justify-end mt-6 space-x-2">
+        <button type="button"
+                onclick="@(Model.Id == 0 ? "closeModal()" : "closeEditModal()")"
+                class="px-4 py-2 border border-gray-400 text-gray-700 rounded hover:bg-gray-100">
             Batal
         </button>
-
-        <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white px-4 py-1.5 rounded">
+        <button type="submit"
+                class="px-4 py-2 bg-[#F58220] text-white rounded hover:bg-orange-600">
             Simpan
         </button>
     </div>
+
+    <!-- Tombol "×" kecil -->
+    <button type="button"
+            onclick="@(Model.Id == 0 ? "closeModal()" : "closeEditModal()")"
+            class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+        &times;
+    </button>
 </form>

@@ -1,34 +1,30 @@
-﻿@{
+﻿@model nge_eatweb.Models.ViewModels.GofoodTransaksiPageViewModel
+
+@{
+    ViewData["Title"] = "Transaksi GoFood";
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
-    ViewData["Title"] = "Transaksi";
 }
 
 <div class="flex min-h-screen bg-[#FAFAFA] text-sm">
     <main class="flex-1 px-8 py-6">
         <!-- Breadcrumb -->
         <div class="text-gray-500 mb-4 flex items-center space-x-1">
-            <a asp-controller="Dashboard" asp-action="Index" class="text-black font-semibold hover:underline">
-                Dashboard
-            </a>
-            <span class="text-[#888]">&gt;</span>
+            <a href="/dashboard" class="text-black font-semibold hover:underline">Dashboard</a>
+            <span class="text-[#888]">></span>
             <span class="text-[#888]">Transaksi GoFood</span>
         </div>
 
-        <!-- Header Buttons -->
-        <div class="flex justify-between items-center mb-6 relative">
-            <div class="flex space-y-3">
-                <button class="flex items-center gap-2 px-2 py-1 text-white font-medium rounded-lg btn-tambah"
-                        style="background-color: #F58220;" onclick="openTambahModal()">
-                    <span class="text-lg">+</span>
-                    <span>Tambah Transaksi</span>
-                </button>
-            </div>
-            <div class="flex space-y-3">
-                <input type="date" id="tanggalFilter" name="tanggalFilter" class="px-3 py-1 border rounded" />
-            </div>
+        <!-- Header dan Tombol Tambah -->
+        <div class="flex justify-between items-center mb-6">
+            <button class="flex items-center gap-2 px-3 py-1 text-white font-medium rounded-lg"
+                    style="background-color: #F58220;" onclick="openTambahModal()">
+                <span class="text-lg">+</span>
+                <span>Tambah Transaksi</span>
+            </button>
+            <input type="date" id="tanggalFilter" name="tanggalFilter" class="px-3 py-1 border rounded" />
         </div>
 
-        <!-- Table -->
+        <!-- Tabel Transaksi -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <table class="min-w-full table-auto">
                 <thead class="bg-[#ffd5ab] text-gray-700 text-center text-sm font-semibold select-none">
@@ -37,100 +33,72 @@
                         <th class="px-6 py-3">Tanggal</th>
                         <th class="px-6 py-3">Waktu</th>
                         <th class="px-6 py-3">Nama Pelanggan</th>
-                        <th class="px-6 py-3">Metode Pembayaran</th>
-                        <th class="px-6 py-3 max-w-[150px]">Item Pemesanan</th>
+                        <th class="px-6 py-3">Metode</th>
+                        <th class="px-6 py-3 max-w-[150px]">Item</th>
                         <th class="px-6 py-3">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-700 text-center text-sm">
-                    @if (Model?.Transactions != null && Model.Transactions.Any())
+                <tbody class="text-center text-sm text-gray-700">
+                    @if (Model.TransaksiList.Any())
+
                     {
-                        foreach (var t in Model.Transactions)
+                        foreach (var t in Model.TransaksiList)
+
                         {
-                            <tr>
-                                <td>@t.Id</td>
-                                <td>@t.Tanggal</td>
-                                <td>@t.Menu</td>
-                                <td>@t.Total</td>
-                                <!-- Tambah kolom lain sesuai kebutuhan -->
+                            <tr class="border-t hover:bg-gray-50">
+                                <td class="px-6 py-3">@t.IdPesanan</td>
+                                <td class="px-6 py-3">@t.TanggalTransaksi.ToString("yyyy-MM-dd")</td>
+                                <td class="px-6 py-3">@t.Waktu</td>
+                                <td class="px-6 py-3">@t.NamaPelanggan</td>
+                                <td class="px-6 py-3">@t.Metode</td>
+                                <td class="px-6 py-3">@t.NamaItem</td>
+                                <td class="px-6 py-3">
+                                    <div class="flex justify-center space-x-4">
+                                        <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                            <i class="fas fa-pen-to-square text-lg"></i>
+                                        </a>
+                                        <button class="text-red-600 hover:text-red-800" title="Hapus">
+                                            <i class="fas fa-trash-alt text-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-gray-500 py-4">Data belum tersedia.</td>
+                            <td colspan="7" class="py-6 text-center text-gray-500">Belum ada transaksi.</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </main>
-
-    <!-- Pagination moved outside main -->
 </div>
 
-<!-- Dummy Pagination for Frontend Preview -->
-<div class="mt-6 mb-10 flex justify-center space-x-2">
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-[#F58220] text-white">1</a>
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">2</a>
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">3</a>
+<!-- Modal Tambah Transaksi -->
+<div id="transactionTambahModal" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        @await Html.PartialAsync("_GofoodTransaksiFormPartial", Model.FormModel)
+
+        <button onclick="closeTambahModal()"
+                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+            &times;
+        </button>
+    </div>
 </div>
-
-
-          
 
 @section Scripts {
     <script>
-        // Fungsi modal
-        function openEditModal(platform, id) {
-          $('#transactionEditModal').removeClass('hidden');
-          fetch(`/${platform}/${id}/edit-json`)
-            .then(r => r.json()).then(data => {
-              $('#tanggal').val(data.tanggal);
-              $('#waktu').val(data.waktu);
-              $('#id_pesanan').val(data.id_pesanan);
-              $('#nama_pelanggan').val(data.nama_pelanggan);
-              $('#metode_pembayaran').val(data.metode_pembayaran);
-              $('#grand_total').val(data.total);
-              $('#formEditTransaksi').attr('action', `/${platform}/update/${id}`);
-            });
+        function openTambahModal() {
+            document.getElementById('transactionTambahModal').classList.remove('hidden');
+            document.getElementById('transactionTambahModal').classList.add('flex');
         }
-        function closeEditModal() { $('#transactionEditModal').addClass('hidden'); }
-        function openTambahModal() { $('#transactionTambahModal').removeClass('hidden'); }
-        function closeTambahModal() { $('#transactionTambahModal').addClass('hidden'); }
-        function openHapusModal(id) {
-          $('#openHapusModal').removeClass('hidden');
-          $('#confirmDeleteBtn').data('id', id);
+
+        function closeTambahModal() {
+            document.getElementById('transactionTambahModal').classList.remove('flex');
+            document.getElementById('transactionTambahModal').classList.add('hidden');
         }
-        function closeHapusModal() { $('#openHapusModal').addClass('hidden'); }
-        function openDetailModal() { $('#transactionDetailModal').removeClass('hidden'); }
-        function closeDetailModal() { $('#transactionDetailModal').addClass('hidden'); }
-
-        // Click di luar modal
-        $(window).click(function(e){
-          if ($(e.target).is('#transactionEditModal')) closeEditModal();
-          if ($(e.target).is('#transactionTambahModal')) closeTambahModal();
-          if ($(e.target).is('#openHapusModal')) closeHapusModal();
-          if ($(e.target).is('#transactionDetailModal')) closeDetailModal();
-        });
-
-        // Event tombol
-        $('.btn-tambah').click(openTambahModal);
-        $('.btn-edit').click(function(){ openEditModal('gofood', $(this).data('id')); });
-        $('.btn-lihat').click(function(){
-          var btn = $(this);
-          $('#detail-id_pesanan').val(btn.data('id'));
-          $('#detail-tanggal').val(btn.data('tanggal'));
-          $('#detail-waktu').val(btn.data('waktu'));
-          $('#detail-nama').val(btn.data('nama'));
-          $('#detail-metode').val(btn.data('pembayaran'));
-          $('#detail-status').val(btn.data('status'));
-          var ul = $('#detail-item-list').empty();
-          btn.data('item').split(',').forEach(function(i){ ul.append(`<li>${i.trim()}</li>`); });
-          $('#detail-total-value').text('Rp ' + parseInt(btn.data('total')).toLocaleString('id-ID'));
-          openDetailModal();
-        });
     </script>
 }
-
