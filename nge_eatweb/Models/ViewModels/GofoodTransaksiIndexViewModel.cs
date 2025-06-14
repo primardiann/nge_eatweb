@@ -5,6 +5,7 @@ namespace nge_eatweb.Models.ViewModels
 {
     public class GofoodTransaksiIndexViewModel
     {
+        public int IdTransaksi { get; set; }
         public string IdPesanan { get; set; } = string.Empty;
         public string NamaPelanggan { get; set; } = string.Empty;
         public DateTime TanggalTransaksi { get; set; }

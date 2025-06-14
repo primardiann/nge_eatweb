@@ -115,22 +115,21 @@ namespace nge_eatweb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string idPesanan)
         {
             using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             conn.Open();
 
-            string query = "DELETE FROM transaksi WHERE id_transaksi = @IdTransaksi";
+            string query = "DELETE FROM transaksi WHERE id_pesanan = @IdPesanan";
 
             using var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@IdTransaksi", id);
+            cmd.Parameters.AddWithValue("@IdPesanan", idPesanan);
             cmd.ExecuteNonQuery();
 
             TempData["Success"] = "Transaksi berhasil dihapus.";
             return RedirectToAction(nameof(Index));
         }
 
-        // 🔁 Helper: Load dropdown item dan kategori
         private (List<SelectListItem>, List<string>) LoadItemOptionsWithKategori()
         {
             var itemOptions = new List<SelectListItem>();
@@ -171,6 +170,7 @@ namespace nge_eatweb.Controllers
 
             string query = @"
         SELECT 
+            t.id_transaksi,
             t.id_pesanan,
             t.nama_pelanggan,
             t.tanggal_transaksi,
@@ -187,31 +187,40 @@ namespace nge_eatweb.Controllers
 
             while (reader.Read())
             {
-                var idPesanan = reader.GetString(0); // id_pesanan
+                int idTransaksi = reader.GetInt32(0);         // t.id_transaksi
+                string idPesanan = reader.GetString(1);       // t.id_pesanan
 
                 if (!transaksiDict.ContainsKey(idPesanan))
                 {
                     transaksiDict[idPesanan] = new GofoodTransaksiIndexViewModel
                     {
+                        IdTransaksi = idTransaksi,
                         IdPesanan = idPesanan,
-                        NamaPelanggan = reader.GetString(1),
-                        TanggalTransaksi = reader.GetDateTime(2),
-                        Waktu = reader.GetTimeSpan(3),
-                        Metode = reader.GetString(4),
+                        NamaPelanggan = reader.GetString(2),       // t.nama_pelanggan
+                        TanggalTransaksi = reader.GetDateTime(3),  // t.tanggal_transaksi
+                        Waktu = reader.GetTimeSpan(4),             // t.waktu
+                        Metode = reader.GetString(5),              // t.metode
                         Items = new List<ItemDetail>()
                     };
                 }
 
-                transaksiDict[idPesanan].Items.Add(new ItemDetail
+                var transaksi = transaksiDict[idPesanan];
+                var kategori = reader.GetString(7); // i.kategori
+
+                // Cegah kategori duplikat
+                bool kategoriSudahAda = transaksi.Items.Any(i => i.Kategori == kategori);
+
+                transaksi.Items.Add(new ItemDetail
                 {
-                    NamaItem = reader.GetString(5),
-                    Kategori = reader.GetString(6)
+                    NamaItem = reader.GetString(6),  // i.nama_item
+                    Kategori = kategoriSudahAda ? "" : kategori
+
                 });
             }
 
-
             return transaksiDict.Values.ToList();
         }
+
 
 
     }
