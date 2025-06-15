@@ -18,14 +18,23 @@ namespace nge_eatweb.Controllers
         }
 
         // Tampil list transaksi grouped by id_pesanan
-        public IActionResult Index()
+        public IActionResult Index(DateTime? filterDate, int page = 1)
         {
-            var transaksiList = LoadTransaksiList();
+            const int pageSize = 10;
+
+            var transaksiList = LoadTransaksiList(filterDate);
+
+            int totalItems = transaksiList.Count;
+            var pagedTransaksi = transaksiList
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
             var (itemOptions, kategoriList) = LoadItemOptionsWithKategori();
 
             var viewModel = new GofoodTransaksiPageViewModel
             {
-                TransaksiList = transaksiList,
+                TransaksiList = pagedTransaksi,
                 FormModel = new GofoodTransaksiFormViewModel
                 {
                     ItemOptions = itemOptions,
@@ -34,7 +43,10 @@ namespace nge_eatweb.Controllers
                     Waktu = DateTime.Now.TimeOfDay,
                     IdPesanan = $"GFOOD{DateTime.Now:yyyyMMddHHmmss}",
                     ItemList = new List<ItemOrder> { new ItemOrder() }
-                }
+                },
+                FilterDate = filterDate,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
             };
 
             return View(viewModel);
@@ -294,7 +306,7 @@ namespace nge_eatweb.Controllers
         }
 
         // Load transaksi grouped by id_pesanan, kumpulkan item dan kategori tanpa duplikasi kategori ditampilkan hanya sekali
-        private List<GofoodTransaksiIndexViewModel> LoadTransaksiList()
+        private List<GofoodTransaksiIndexViewModel> LoadTransaksiList(DateTime? filterDate = null)
         {
             var transaksiDict = new Dictionary<string, GofoodTransaksiIndexViewModel>();
 
@@ -313,11 +325,13 @@ namespace nge_eatweb.Controllers
                     i.kategori
                 FROM transaksi t
                 INNER JOIN items i ON t.id_item = i.id_item
+                WHERE (@FilterDate IS NULL OR CAST(t.tanggal_transaksi AS DATE) = @FilterDate)
                 ORDER BY t.id_pesanan, t.id_transaksi";
 
             using var cmd = new SqlCommand(query, conn);
-            using var reader = cmd.ExecuteReader();
+            cmd.Parameters.AddWithValue("@FilterDate", (object?)filterDate ?? DBNull.Value);
 
+            using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 int idTransaksi = reader.GetInt32(0);
@@ -350,5 +364,6 @@ namespace nge_eatweb.Controllers
 
             return transaksiDict.Values.ToList();
         }
+
     }
 }
