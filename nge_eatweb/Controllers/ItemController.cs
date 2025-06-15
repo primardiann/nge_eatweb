@@ -2,8 +2,8 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using nge_eatweb.Models;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace nge_eatweb.Controllers
 {
@@ -16,17 +16,41 @@ namespace nge_eatweb.Controllers
             _configuration = configuration;
         }
 
-        public IActionResult Index(int page = 1)
+        public IActionResult Index(string kategori, int page = 1)
         {
             int pageSize = 10;
             var itemList = new List<ItemTerjualViewModel>();
-            var connStr = _configuration.GetConnectionString("DefaultConnection");
+            var kategoriList = new List<string>();
+            int totalItems = 0;
 
-            using (var conn = new SqlConnection(connStr))
+            using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 conn.Open();
 
-                var query = @"
+                // Ambil semua kategori unik
+                var kategoriCmd = new SqlCommand("SELECT DISTINCT kategori FROM items", conn);
+                using (var reader = kategoriCmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        kategoriList.Add(reader["kategori"].ToString());
+                    }
+                }
+
+                // Hitung total item untuk pagination
+                var countCmd = new SqlCommand(@"
+                    SELECT COUNT(*) FROM (
+                        SELECT i.id_item
+                        FROM items i
+                        LEFT JOIN transaksi t ON i.id_item = t.id_item
+                        WHERE (@kategori IS NULL OR i.kategori = @kategori)
+                        GROUP BY i.id_item
+                    ) AS CountedItems", conn);
+                countCmd.Parameters.AddWithValue("@kategori", string.IsNullOrEmpty(kategori) ? DBNull.Value : (object)kategori);
+                totalItems = (int)countCmd.ExecuteScalar();
+
+                // Ambil data item terjual dengan pagination
+                var dataCmd = new SqlCommand(@"
                     SELECT 
                         i.id_item,
                         i.nama_item,
@@ -35,36 +59,37 @@ namespace nge_eatweb.Controllers
                         ISNULL(SUM(t.jumlah), 0) AS jumlah_terjual
                     FROM items i
                     LEFT JOIN transaksi t ON i.id_item = t.id_item
-                    GROUP BY 
-                        i.id_item, i.nama_item, i.kategori, i.harga
-                    ORDER BY jumlah_terjual DESC";
+                    WHERE (@kategori IS NULL OR i.kategori = @kategori)
+                    GROUP BY i.id_item, i.nama_item, i.kategori, i.harga
+                    ORDER BY jumlah_terjual DESC
+                    OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY", conn);
 
-                using (var cmd = new SqlCommand(query, conn))
+                dataCmd.Parameters.AddWithValue("@kategori", string.IsNullOrEmpty(kategori) ? DBNull.Value : (object)kategori);
+                dataCmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+                dataCmd.Parameters.AddWithValue("@pageSize", pageSize);
+
+                using (var reader = dataCmd.ExecuteReader())
                 {
-                    using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        itemList.Add(new ItemTerjualViewModel
                         {
-                            itemList.Add(new ItemTerjualViewModel
-                            {
-                                IdItem = (int)reader["id_item"],
-                                NamaItem = reader["nama_item"].ToString(),
-                                Kategori = reader["kategori"].ToString(),
-                                Harga = Convert.ToDecimal(reader["harga"]),
-                                JumlahTerjual = Convert.ToInt32(reader["jumlah_terjual"])
-                            });
-                        }
+                            IdItem = (int)reader["id_item"],
+                            NamaItem = reader["nama_item"].ToString(),
+                            Kategori = reader["kategori"].ToString(),
+                            Harga = Convert.ToDecimal(reader["harga"]),
+                            JumlahTerjual = Convert.ToInt32(reader["jumlah_terjual"])
+                        });
                     }
                 }
             }
 
-            int totalItems = itemList.Count;
-            var pagedItems = itemList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             ViewBag.CurrentPage = page;
+            ViewBag.KategoriList = kategoriList;
+            ViewBag.SelectedKategori = kategori;
 
-            return View(pagedItems);
+            return View(itemList);
         }
     }
 }

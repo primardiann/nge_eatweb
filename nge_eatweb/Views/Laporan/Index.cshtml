@@ -65,7 +65,7 @@
                 <div class="flex items-center space-x-4">
                     <!-- Tanggal -->
                     <input type="date" name="tanggalFilter" value="@Model.FilterTanggal?.ToString("yyyy-MM-dd")" class="border px-3 py-1.5 rounded text-sm" />
-                    <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white text-sm px-3 py-1.5 rounded">Terapkan</button>
+                    <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white text-sm px-3 py-1.5 rounded">Filter</button>
 
                     <!-- Unduh -->
                     <a href="@Url.Action("ExportPdf", "Laporan", new { tanggalFilter = Model.FilterTanggal })"
