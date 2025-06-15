@@ -1,142 +1,149 @@
 ﻿@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var chartData = ((decimal[])ViewBag.PendapatanBulanan ?? new decimal[12]);
 }
 
 <div class="p-6 space-y-6">
     <h1 class="text-xl font-semibold mb-4">Dashboard</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- Kartu Transaksi GoFood -->
-        <a href="/Gofood"
-           class="block bg-white rounded-lg p-4 flex flex-col items-center justify-center space-y-3"
-           style="border: 1px solid #F58220;">
-            <span class="font-medium text-center">Transaksi GoFood</span>
-            <img src="~/images/transaksi.png" alt="Transaksi GoFood" class="w-12 h-12" />
-            <span class="bg-orange-500 hover:bg-orange-600 text-white text-xs px-4 py-1.5 rounded-full inline-flex items-center justify-between space-x-2 shadow-md transition duration-300 font-semibold cursor-pointer">
-                <span>Selengkapnya</span>
-                <span class="bg-white rounded-full p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-orange-500" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                </span>
-            </span>
-        </a>
+    <!-- Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-white border border-orange-400 rounded-2xl p-6 shadow-md flex items-center space-x-4">
+            <div class="bg-orange-100 text-orange-500 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8c-1.105 0-2-.672-2-1.5S10.895 5 12 5s2 .672 2 1.5S13.105 8 12 8zm0 8c-1.105 0-2-.672-2-1.5S10.895 13 12 13s2 .672 2 1.5S13.105 16 12 16z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Total Pendapatan GoFood</p>
+                <h2 class="text-2xl font-bold text-gray-900">Rp @ViewBag.TotalGofood?.ToString("N0")</h2>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white border border-orange-400 rounded-2xl p-6 shadow-md flex items-center space-x-4">
+            <div class="bg-orange-100 text-orange-500 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 10h2l.4 2M7 4h10l1 2h4v2H4.4l-.6-3H2" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Jumlah Transaksi</p>
+                <h2 class="text-2xl font-bold text-gray-900">@ViewBag.JumlahTransaksi</h2>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white border border-orange-400 rounded-2xl p-6 shadow-md flex items-center space-x-4">
+            <div class="bg-orange-100 text-orange-500 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Item Terjual</p>
+                <h2 class="text-2xl font-bold text-gray-900">@ViewBag.TotalItemTerjual</h2>
+            </div>
+        </div>
     </div>
 
     <!-- Grafik Pendapatan -->
-    <div class="bg-white rounded-lg p-6 mt-6" style="border: 1px solid #F58220;">
+    <div class="bg-white rounded-2xl p-6 mt-6 border border-orange-400">
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h2 class="font-bold text-lg">Pendapatan</h2>
-                <p class="text-sm text-gray-600">Pendapatan store kuliner anda!</p>
+                <h2 class="font-bold text-lg text-gray-900">Pendapatan GoFood</h2>
+                <p class="text-sm text-gray-600">Grafik bulanan tahun 2024</p>
             </div>
-            <select class="border rounded px-3 py-1 text-sm font-medium" style="border-color: #F58220;">
-                <option>2019</option>
-                <option>2020</option>
-                <option>2021</option>
-                <option>2022</option>
-                <option>2023</option>
+            <select class="border rounded px-3 py-1 text-sm font-medium text-gray-700" style="border-color: #F58220;" disabled>
                 <option selected>2024</option>
-                <option>2025</option>
             </select>
         </div>
 
-        <div class="w-full h-64 rounded mb-4 overflow-x-auto flex justify-center items-center">
-            <canvas id="pendapatanChart" style="width: 1200px; height: 100%;"></canvas>
+        <div class="w-full h-96 flex justify-center items-center">
+            <canvas id="pendapatanChart" class="w-full h-full"></canvas>
         </div>
-
-        <p class="text-sm font-semibold">Pendapatan <span class="text-black text-base">Rp.30.000.000</span></p>
     </div>
 </div>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('pendapatanChart').getContext('2d');
+    const pendapatanData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(chartData));
+    const ctx = document.getElementById('pendapatanChart').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-                datasets: [{
-                    label: 'Pendapatan (Juta Rp)',
-                    data: [2, 3, 2.5, 4, 5, 4.5, 6, 7, 6.5, 8, 7.5, 9],
-                    borderColor: '#F58220',
-                    backgroundColor: 'rgba(245, 130, 32, 0.3)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                }]
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(245, 130, 32, 0.4)');
+    gradient.addColorStop(1, 'rgba(245, 130, 32, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            datasets: [{
+                label: 'Pendapatan (Juta Rp)',
+                data: pendapatanData,
+                borderColor: '#F58220',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#333',
+                        callback: function (value) {
+                            return value + ' jt';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#333'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.03)'
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) {
-                                return value + ' jt';
-                            }
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#333',
+                        font: {
+                            size: 14
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#333',
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return `Rp ${context.parsed.y} juta`;
-                            }
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#F58220',
+                    bodyColor: '#333',
+                    borderColor: '#F58220',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function (context) {
+                            return `Rp ${context.parsed.y} juta`;
                         }
                     }
                 }
             }
-        });
+        }
     });
 </script>
-
-<style>
-    @@media (max-width: 640px) {
-        .inline-flex.items-center.justify-between.space-x-2
-
-    {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    }
-
-    @@media (max-width: 768px) {
-        #pendapatanChart
-
-    {
-        width: 100% !important;
-        height: auto !important;
-    }
-
-    }
-
-    @@media (max-width: 480px) {
-        .grid > a
-
-    {
-        padding: 1rem !important;
-    }
-
-    .grid > a img {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-
-    }
-</style>

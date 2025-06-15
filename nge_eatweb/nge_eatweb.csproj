@@ -15,6 +15,7 @@
     <PackageReference Include="EPPlus" Version="8.0.5" />
     <PackageReference Include="itext7" Version="9.2.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
