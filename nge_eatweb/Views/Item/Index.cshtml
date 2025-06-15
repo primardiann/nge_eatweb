@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<nge_eatweb.Models.ItemTerjualViewModel>
+
+@{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
     ViewData["Title"] = "Item Terjual";
 }
@@ -15,11 +17,6 @@
             <span class="text-[#888]">Item Terjual</span>
         </div>
 
-        <!-- Filter Tanggal -->
-        <div class="flex justify-end items-center mb-6 relative">
-            <input type="date" id="tanggalFilter" name="tanggalFilter" class="px-3 py-1 border rounded" />
-        </div>
-
         <!-- Tabel Item Terjual -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <table class="min-w-full table-auto">
@@ -32,19 +29,38 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 text-center text-sm">
-                    @* Placeholder untuk data kosong *@
-                    <tr>
-                        <td colspan="4" class="text-center text-gray-500 py-4">Data belum tersedia.</td>
-                    </tr>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="px-6 py-4">@item.Kategori</td>
+                                <td class="px-6 py-4">@item.NamaItem</td>
+                                <td class="px-6 py-4">Rp @item.Harga.ToString("N0")</td>
+                                <td class="px-6 py-4">@item.JumlahTerjual</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-gray-500 py-4">Data belum tersedia.</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
-    </main>
-</div>
 
-<!-- Dummy Pagination -->
-<div class="mt-6 mb-10 flex justify-center space-x-2">
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-[#F58220] text-white">1</a>
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">2</a>
-    <a href="#" class="px-3 py-1 rounded-md border text-sm bg-white text-gray-700 hover:bg-gray-100">3</a>
+        <!-- Pagination -->
+        <div class="mt-6 mb-10 flex justify-center space-x-2">
+            @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+            {
+                <a href="?page=@i"
+                   class="px-3 py-1 rounded-md border text-sm @(i == (int)ViewBag.CurrentPage ? "bg-[#F58220] text-white" : "bg-white text-gray-700 hover:bg-gray-100")">
+                    @i
+                </a>
+            }
+        </div>
+
+    </main>
 </div>
