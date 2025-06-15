@@ -32,6 +32,8 @@ namespace nge_eatweb.Models.ViewModels
         // ✅ WAJIB: Daftar item yang akan dibeli
         [Required(ErrorMessage = "Minimal 1 item harus dipilih.")]
         public List<ItemOrder> ItemList { get; set; } = new(); // <--- ini yang sebelumnya belum ada
+        public bool IsEdit { get; set; }
+
     }
 
     public class ItemOrder

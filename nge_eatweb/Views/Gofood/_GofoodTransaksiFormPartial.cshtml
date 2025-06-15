@@ -1,6 +1,6 @@
 ﻿@model nge_eatweb.Models.ViewModels.GofoodTransaksiFormViewModel
 
-<form id="formTambahTransaksi" asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
     <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700">
         <div>
             <label asp-for="TanggalTransaksi" class="mb-1 block">Tanggal</label>
@@ -12,7 +12,7 @@
         </div>
         <div>
             <label asp-for="IdPesanan" class="mb-1 block">ID Pesanan</label>
-            <input asp-for="IdPesanan" placeholder="Contoh: GF-1234567" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
+            <input asp-for="IdPesanan" class="border rounded-sm px-2 py-1 w-full bg-gray-100 shadow-sm" style="border-color: #F58220;" readonly />
         </div>
         <div>
             <label asp-for="NamaPelanggan" class="mb-1 block">Nama Pelanggan</label>
@@ -20,111 +20,60 @@
         </div>
     </div>
 
-    <!-- Dropdown Kategori -->
-    <div class="mt-4">
-        <label class="mb-1 block">Kategori</label>
-        <select id="kategoriSelect" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm">
-            <option value="">-- Pilih Kategori --</option>
-            @foreach (var kategori in Model.KategoriList.Distinct())
-            {
-                <option value="@kategori">@kategori</option>
-            }
-        </select>
-    </div>
-
-    <!-- Dropdown Menu & Jumlah -->
     <div id="itemContainer" class="space-y-4 mt-4">
-        <div class="item-group grid grid-cols-2 gap-4">
-            <div>
-                <label class="mb-1 block">Nama Menu</label>
-                <select name="ItemList[0].IdItem" class="item-select border rounded-sm px-2 py-1 w-full bg-white shadow-sm" required>
-                    <option value="">-- Pilih Menu --</option>
-                    @foreach (var item in Model.ItemOptions)
-                    {
-                        var parts = item.Text.Split('|');
-                        var nama = parts[0];
-                        var harga = parts.Length > 1 ? parts[1] : "0";
-                        var kategori = parts.Length > 2 ? parts[2] : "";
-                        <option value="@item.Value" data-harga="@harga" data-kategori="@kategori">@nama</option>
-                    }
-                </select>
+        @for (int i = 0; i < Model.ItemList.Count; i++)
+        {
+            var selectedId = Model.ItemList[i].IdItem.ToString();
+            var jumlah = Model.ItemList[i].Jumlah;
+            <div class="item-group grid grid-cols-2 gap-4">
+                <div>
+                    <label class="mb-1 block">Nama Menu</label>
+                    <select name="ItemList[@i].IdItem" class="item-select border rounded-sm px-2 py-1 w-full bg-white shadow-sm" required>
+                        <option value="">-- Pilih Menu --</option>
+                        @foreach (var item in Model.ItemOptions)
+                        {
+                            var parts = item.Text.Split('|');
+                            var nama = parts[0];
+                            var harga = parts.Length > 1 ? parts[1] : "0";
+                            var selected = item.Value == selectedId ? "selected" : "";
+                            @Html.Raw($"<option value=\"{item.Value}\" data-harga=\"{harga}\" {selected}>{nama}</option>")
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block">Jumlah</label>
+                    <input name="ItemList[@i].Jumlah" type="number" class="item-qty border rounded-sm px-2 py-1 w-full bg-white shadow-sm" value="@jumlah" min="1" required />
+                </div>
             </div>
-            <div>
-                <label class="mb-1 block">Jumlah</label>
-                <input name="ItemList[0].Jumlah" type="number" class="item-qty border rounded-sm px-2 py-1 w-full bg-white shadow-sm" value="1" min="1" required />
-            </div>
-        </div>
+        }
     </div>
-
-    <button type="button" onclick="tambahItem()" class="mt-2 text-sm text-blue-600 underline">+ Tambah Item</button>
 
     <div class="grid grid-cols-2 gap-4 mt-4">
         <div>
             <label asp-for="Metode" class="mb-1 block">Metode Pembayaran</label>
             <input asp-for="Metode" class="border rounded-sm px-2 py-1 w-full bg-white shadow-sm" style="border-color: #F58220;" required />
         </div>
-        <div>
-            <label asp-for="Total" class="mb-1 block">Total Semua</label>
-            <input asp-for="Total" name="Total" type="number" value="0" class="border rounded-sm px-2 py-1 w-full bg-gray-100" style="border-color: #F58220;" readonly />
-        </div>
     </div>
 
-    <div class="mt-6 flex justify-between items-center">
-        <div>
-            <button type="button" onclick="closeTambahModal()" class="bg-red-700 hover:bg-red-800 text-white px-4 py-1.5 rounded shadow mr-2">Batal</button>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded shadow">Tambah</button>
-        </div>
+    <!-- Tombol Batal dan Simpan -->
+    <div class="flex justify-end mt-6 space-x-2">
+        <button type="button"
+        @(Model.IdPesanan == "" ? "closeModal()" : "closeEditModal()")
+                class="px-4 py-2 border border-gray-400 text-gray-700 rounded hover:bg-gray-100">
+            Batal
+        </button>
+        <button type="submit"
+                class="px-4 py-2 bg-[#F58220] text-white rounded hover:bg-orange-600">
+            Simpan
+        </button>
     </div>
 </form>
 
 <script>
-    let itemIndex = 1;
-
-    function tambahItem() {
-        const container = document.getElementById("itemContainer");
-        const optionHTML = document.querySelector(".item-select").innerHTML;
-
-        const html = `
-        <div class="item-group grid grid-cols-2 gap-4">
-            <div>
-                <label class="mb-1 block">Nama Menu</label>
-                <select name="ItemList[${itemIndex}].IdItem" class="item-select border rounded-sm px-2 py-1 w-full bg-white shadow-sm" required>
-                    ${optionHTML}
-                </select>
-            </div>
-            <div>
-                <label class="mb-1 block">Jumlah</label>
-                <input name="ItemList[${itemIndex}].Jumlah" type="number" class="item-qty border rounded-sm px-2 py-1 w-full bg-white shadow-sm" value="1" min="1" required />
-            </div>
-        </div>`;
-
-        container.insertAdjacentHTML("beforeend", html);
-
-        const newGroup = container.lastElementChild;
-        const newSelect = newGroup.querySelector(".item-select");
-        const newQty = newGroup.querySelector(".item-qty");
-
-        // Filter berdasarkan kategori yang dipilih
-        const selectedKategori = document.getElementById("kategoriSelect").value;
-        Array.from(newSelect.options).forEach(option => {
-            const kategori = option.getAttribute("data-kategori");
-            if (option.value !== "" && selectedKategori && kategori !== selectedKategori) {
-                option.hidden = true;
-            } else {
-                option.hidden = false;
-            }
-        });
-
-        newSelect.addEventListener("change", hitungTotal);
-        newQty.addEventListener("input", hitungTotal);
-
-        itemIndex++;
-        hitungTotal();
-    }
-
     function hitungTotal() {
         let total = 0;
         const groups = document.querySelectorAll(".item-group");
+
         groups.forEach(group => {
             const select = group.querySelector(".item-select");
             const qty = group.querySelector(".item-qty");
@@ -141,35 +90,15 @@
         }
     }
 
-    function inisialisasiFormTransaksi() {
-        const firstSelect = document.querySelector(".item-select");
-        const firstQty = document.querySelector(".item-qty");
-
-        if (firstSelect) firstSelect.addEventListener("change", hitungTotal);
-        if (firstQty) firstQty.addEventListener("input", hitungTotal);
-
-        hitungTotal();
-    }
-
-    // Filter menu saat kategori berubah
-    document.getElementById("kategoriSelect").addEventListener("change", function () {
-        const selectedKategori = this.value;
-        const selects = document.querySelectorAll(".item-select");
-
-        selects.forEach(select => {
-            Array.from(select.options).forEach(option => {
-                const optionKategori = option.getAttribute("data-kategori");
-                const shouldShow = !selectedKategori || optionKategori === selectedKategori || option.value === "";
-                option.hidden = !shouldShow;
-            });
-
-            if (select.selectedOptions[0]?.hidden) {
-                select.value = "";
-            }
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".item-select").forEach(select => {
+            select.addEventListener("change", hitungTotal);
         });
 
-        hitungTotal();
-    });
+        document.querySelectorAll(".item-qty").forEach(input => {
+            input.addEventListener("input", hitungTotal);
+        });
 
-    document.addEventListener("DOMContentLoaded", inisialisasiFormTransaksi);
+        hitungTotal(); // hitung awal saat form load
+    });
 </script>
