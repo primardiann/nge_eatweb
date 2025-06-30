@@ -40,7 +40,7 @@ namespace nge_eatweb.Controllers
                         decimal total = Convert.ToDecimal(reader["TotalPendapatan"]);
                         if (bulan >= 1 && bulan <= 12)
                         {
-                            pendapatanBulanan[bulan - 1] = total / 1_000_000; // dalam juta rupiah
+                            pendapatanBulanan[bulan - 1] = total / 1_000; // dalam juta rupiah
                         }
                     }
                 }
